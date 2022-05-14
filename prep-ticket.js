@@ -42,14 +42,14 @@ async function main() {
                 const content = message.content
                 if (!content) continue
 
-                if (content.match(/(Finding|Theory|Bug|Theory\/Finding\/Bug):/i)) {
+                if (content.match(/\**(Finding|Theory|Bug|Theory\/Finding\/Bug)\**:\**/i)) {
                     finding = content
                     evidence = ""
                     significance = ""
-                } else if (content.match(/Evidence:/i)) {
+                } else if (content.match(/\**Evidence\**:\**/i)) {
                     evidence = content
                     significance = ""
-                } else if (content.match(/Significance:/i)) {
+                } else if (content.match(/\**Significance\**:\**/i)) {
                     significance = content
                 } else
                     continue
@@ -85,6 +85,7 @@ ${significance}`
 ${findings}
 `)
             console.log(`:wicked: paste evidence stuff first`)
+            console.log(`Create PR link: https://github.com/Tibowl/TCL/pull/new/${channel}`)
         } catch (error) {
             console.error(`Couldn't parse messages:`, error)
         }
