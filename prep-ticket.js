@@ -77,6 +77,7 @@ ${significance}`
             console.log(beautifiedChannel)
 
             await write(`### ${beautifiedChannel}
+
 **By:** ${nick}\\#${tag}  
 **Added:** ${date}  
 [Discussion](${url})
