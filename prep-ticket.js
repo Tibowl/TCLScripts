@@ -69,14 +69,14 @@ async function main() {
 ${evidence}
 
 ${significance}`
-            .replace(/\**(Finding|Theory|Bug|Theory\/Finding\/Bug|Evidence|Significance)\**:\**\s*/gi, (_, a) => `**${a}:**\n`)
+            .replace(/\**(Finding|Theory|Bug|Theory\/Finding\/Bug|Evidence|Significance)\**:\**\s*/gi, (_, a) => `**${a}:**  \n`)
             .replace(/(https?:\/\/.*)(\s)/g, (_, url, w) => `[${getDomain(url)}](${url})${w}`)
             .trim()
 
-            const beautifiedChannel = channel.replace(/-/g, " ").replace(/^./, (a) => a.toUpperCase())
+            const beautifiedChannel = channel.replace(/-/g, " ").replace(/(^|\s)./g, (a) => a.toUpperCase())
             console.log(beautifiedChannel)
 
-            await write(`## ${beautifiedChannel}
+            await write(`### ${beautifiedChannel}
 **By:** ${nick}\\#${tag}  
 **Added:** ${date}  
 [Discussion](${url})
