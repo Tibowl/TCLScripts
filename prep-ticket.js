@@ -15,7 +15,15 @@ async function main() {
     console.log(`Waiting for link...`)
 
     while (true) {
-        const url = await read()
+        let clipboard = ""
+        try {
+            clipboard = await read()
+        } catch (error) {
+            await sleep(100)
+            continue
+        }
+
+        const url = clipboard
 
         if (!url.startsWith("https://tickettool.xyz/")) {
             await sleep(100)
