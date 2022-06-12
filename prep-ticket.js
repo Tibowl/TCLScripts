@@ -66,11 +66,7 @@ async function main() {
                 tag = message.tag
             }
 
-            const date = new Date().toLocaleDateString("en-US", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric"
-            })
+            const date = new Date().toISOString().split("T")[0]
 
             const findings = `${finding}
 
@@ -81,7 +77,10 @@ ${significance}`
             .replace(/(https?:\/\/.*)(\s)/g, (_, url, w) => `[${getDomain(url)}](${url})${w}`)
             .trim()
 
-            const beautifiedChannel = channel.replace(/-/g, " ").replace(/(^|\s)./g, (a) => a.toUpperCase())
+            const beautifiedChannel = channel
+                .replace(/-/g, " ")
+                .replace(/^./, (a) => a.toUpperCase())
+                .replace(/(^|\s)./g, (a) => ["a", "to", "the"].includes(a) ? a : a.toUpperCase())
             console.log(beautifiedChannel)
 
             await write(`### ${beautifiedChannel}
