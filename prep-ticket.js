@@ -25,89 +25,27 @@ async function main() {
 
         const url = clipboard
 
-        if (!url.startsWith("https://tickettool.xyz/")) {
+        if (!url.startsWith("https://tickets.deeznuts.moe/")) {
             await sleep(100)
             continue
         }
 
-        const discordUrl = (new URL(url)).searchParams.get("url")
-        const data = await (await fetch(discordUrl)).text()
+        const slug = (new URL(url)).pathname.split("/").pop()
+        const data = await (await fetch(`https://tickets.deeznuts.moe/api/transcripts/template?slug=${slug}`)).json()
 
-        const channel = data.split("\n").find(x => x.startsWith("    Channel: ")).match(/ +Channel: (.*) \(\d+\)/)[1]
+        const channel = data.transcript.channelName
         console.log(`Creating branch '${channel}' from '${artesians}/master' and setting up '${own}' as remote...`)
 
         await run("git", ["fetch"])
         await run("git", ["checkout", "-b", channel, `${artesians}/master`])
         await run("git", ["push", "-u", own, channel])
 
-        try {
-            const messages = JSON.parse(data.match(/let messages = (\[.*\]);/)[1])
-
-            let finding = "*Unknown*", evidence = "*Unknown*", significance = "*Unknown*"
-            let nick = "Unknown", tag = "????"
-
-            for (const message of messages) {
-                const content = message.content
-                if (!content) continue
-
-                if (content.match(/\**(Finding|Theory|Bug|Theory\/Finding\/Bug)\**:\**/i)) {
-                    finding = content
-                    evidence = ""
-                    significance = ""
-                } else if (content.match(/\**Evidence\**:\**/i)) {
-                    evidence = content
-                    significance = ""
-                } else if (content.match(/\**Significance\**:\**/i)) {
-                    significance = content
-                } else
-                    continue
-
-                nick = message.nick
-                tag = message.tag
-            }
-
-            const date = new Date().toISOString().split("T")[0]
-
-            const findings = `${finding}
-
-${evidence}
-
-${significance}`
-            .replace(/\**(Finding|Theory|Bug|Theory\/Finding\/Bug|Evidence|Significance)\**:\**\s*/gi, (_, a) => `**${a}:**  \n`)
-            .replace(/(https?:\/\/.*)(\s)/g, (_, url, w) => `[${getDomain(url)}](${url})${w}`)
-            .trim()
-
-            const beautifiedChannel = channel
-                .replace(/-/g, " ")
-                .replace(/^./, (a) => a.toUpperCase())
-                .replace(/(^|\s)./g, (a) => ["a", "to", "the"].includes(a) ? a : a.toUpperCase())
-            console.log(beautifiedChannel)
-
-            await write(`### ${beautifiedChannel}
-
-**By:** ${nick}\\#${tag}  
-**Added:** ${date}  
-[Discussion](${url})
-
-${findings}
-`)
-            console.log(`:wicked: paste evidence stuff first`)
-            console.log(`Create PR link: https://github.com/Tibowl/TCL/pull/new/${channel}`)
-        } catch (error) {
-            console.error(`Couldn't parse messages:`, error)
-        }
+        await write(data.md)
+        console.log(`:wicked: paste evidence stuff first`)
+        console.log(`Create PR link: https://github.com/Tibowl/TCL/pull/new/${channel}`)
 
         await sleep(10000)
     }
-}
-
-function getDomain(str) {
-    const url = new URL(str)
-    if (["youtube.com", "youtu.be"].includes(url.hostname))
-        return "YouTube"
-    if (["i.imgur.com", "imgur.com"].includes(url.hostname))
-        return "Imgur"
-    return url.hostname
 }
 
 async function sleep(time) {
