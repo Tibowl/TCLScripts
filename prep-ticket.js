@@ -36,7 +36,7 @@ async function main() {
         const channel = data.transcript.channelName
         console.log(`Creating branch '${channel}' from '${artesians}/master' and setting up '${own}' as remote...`)
 
-        await run("git", ["fetch"])
+        await run("git", ["fetch", artesians])
         await run("git", ["checkout", "-b", channel, `${artesians}/master`])
         await run("git", ["push", "-u", own, channel])
 
