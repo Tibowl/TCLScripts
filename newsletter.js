@@ -41,8 +41,17 @@ async function main() {
         stuff
             .filter(a => new Date(a.date).getTime() > new Date(startDate).getTime())
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-            .map(({ date, title, user, path }) => `| ${new Date(date).toLocaleString("en-us", { day: "numeric", month: "long" })} | [${title.trim()}](${path.replace(/\\/g, "/").replace("/TCL/", "/")}#${title.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z-]/g, "")}) | ${user.trim()} |`)
+            .map(({ date, title, user, path }, i, a) => {
+                let timestr = format(date)
+                if (i > 0 && format(a[i-1].date) == timestr)
+                    timestr = ""
+                return `| ${timestr} | [${title.trim()}](${path.replace(/\\/g, "/").replace("/TCL/", "/")}#${title.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z-]/g, "")}) | ${user.trim()} |`
+            })
             .join("\n")
     )
+
+    function format(date) {
+        return new Date(date).toLocaleString("en-us", { day: "numeric", month: "long" })
+    }
 }
 main()
